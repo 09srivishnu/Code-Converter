@@ -17,7 +17,6 @@ void convert_python_to_c(const char *python_code) {
             sscanf(line, "print(%[^\n])", message);
             printf("printf(%s);\n", message);
         }
-
         line_ptr = strtok(NULL, "\n");
     }
 }
