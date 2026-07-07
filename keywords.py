@@ -90,7 +90,6 @@ def is_keyword(word, language):
         raise ValueError("Unsupported language: {}".format(language))
 
 def get_token_type(word, language):
-
     if language == 'C':
         return C_KEYWORDS.get(word, 'TOK_IDENTIFIER')
     elif language == 'Python':
