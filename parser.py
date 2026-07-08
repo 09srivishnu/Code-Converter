@@ -145,7 +145,7 @@ class CParser(object):
         
     def parse_multiplicative(self):
         left = self.parse_unary()
-        while self.match('TOK_MUL', 'TOK_DIV', 'TOK_MOD'):
+        while self.match('TOK_STAR', 'TOK_SLASH', 'TOK_PERCENT'):
             op = self.tokens[self.pos - 1].value
             right = self.parse_unary()
             left = BinaryOp(left, op, right)
@@ -192,7 +192,11 @@ class CParser(object):
         return Assignment(name, value)
 
     def parse_var_declaration(self):
-        data_type = self.expect('TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID').value
+        token = self.current_token()
+        if token.type not in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
+            raise SyntaxError('Expected type keyword')
+        data_type = token.value
+        self.advance()
         name = self.expect('TOK_IDENTIFIER').value
         init_value = None
         if self.match('TOK_ASSIGN'):
@@ -201,13 +205,19 @@ class CParser(object):
         return VarDeclaration(data_type, name, init_value)
     
     def parse_function_def(self):
-        return_type = self.expect('TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID').value
+        token = self.current_token()
+        if token.type not in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
+            raise SyntaxError("Expected type keyword")
+        return_type = token.value
         name = self.expect('TOK_IDENTIFIER').value
         self.expect('TOK_LPAREN')
         params = []
         if not self.match('TOK_RPAREN'):
             while True:
-                param_type = self.expect('TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID').value
+                token = self.current_token()
+                if token.type not in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
+                    raise SyntaxError("Expected type keyword")
+                param_type = token.value
                 param_name = self.expect('TOK_IDENTIFIER').value
                 params.append((param_type, param_name))
                 if self.match('TOK_COMMA'):
