@@ -86,10 +86,8 @@ class CLexer(object):
                 self.add_token(token_type, op)
                 continue
         
-        # Unknown char
             self.advance()
     
-    # Add EOF token
         self.add_token('TOK_EOF', '')
         return self.token
 
