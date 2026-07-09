@@ -10,10 +10,10 @@ class Identifier(ASTNode):
         self.name = name
 
 class VarDeclaration(ASTNode):
-    def __init__(self, data_type, name, init_value):
+    def __init__(self, data_type, name, value):
         self.data_type = data_type
         self.name = name
-        self.init_value = None if init_value is None else init_value
+        self.value = None if value is None else value
 
 class Assignment(ASTNode):
     def __init__(self, name, value):

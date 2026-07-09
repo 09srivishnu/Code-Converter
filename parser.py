@@ -212,12 +212,12 @@ class CParser(object):
         data_type = token.value
         self.advance()
         name = self.expect('TOK_IDENTIFIER').value
-        init_value = None
+        value = None
         if self.match('TOK_ASSIGN'):
-            init_value = self.parse_expression()
+            value = self.parse_expression()
         self.expect('TOK_SEMICOLON')
-        return VarDeclaration(data_type, name, init_value)
-    
+        return VarDeclaration(data_type, name, value)
+
     def parse_function_def(self):
         token = self.current_token()
         if token.type not in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
@@ -264,11 +264,8 @@ class CParser(object):
         return WhileLoop(condition, body)
 
     def parse_for_loop(self):
-        print("DEBUG: parse_for_loop START")
         self.expect('TOK_FOR')
-        print("DEBUG: after FOR")
         self.expect('TOK_LPAREN')
-        print("DEBUG: after LPAREN")
         init = None
         if self.current_token().type in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
             token = self.current_token()
@@ -283,17 +280,11 @@ class CParser(object):
         else:
             init = self.parse_expression()
             self.expect('TOK_SEMICOLON')
-        print("DEBUG: after init, current token:", self.current_token().type, self.current_token().value)
         condition = self.parse_expression()
-        print("DEBUG: after condition, current token:", self.current_token().type, self.current_token().value)
         self.expect('TOK_SEMICOLON')
-        print("DEBUG: after cond semicolon")
         increment = self.parse_expression()
-        print("DEBUG: after increment, current token:", self.current_token().type, self.current_token().value)
         self.expect('TOK_RPAREN')
-        print("DEBUG: after RPAREN")
         body = self.parse_block()
-        print("DEBUG: after body")
         return ForLoop(init, condition, increment, body)     
 
     def parse_do_while_loop(self):
