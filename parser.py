@@ -232,7 +232,7 @@ class CParser(object):
         return FunctionDef(return_type, name, params, body)
 
     def parse_if_statement(self):
-        self.consume('TOK_IF')
+        self.expect('TOK_IF')
         self.expect('TOK_LPAREN')
         condition = self.parse_expression()
         self.expect('TOK_RPAREN')
@@ -241,3 +241,70 @@ class CParser(object):
         if self.match('TOK_ELSE'):
             else_body = self.parse_block()
         return IfStatement(condition, body, else_body)
+    
+    def parse_while_loop(self):
+        self.expect('TOK_WHILE')
+        self.expect('TOK_LPAREN')
+        condition = self.parse_expression()
+        self.expect('TOK_RPAREN')
+        body = self.parse_block()
+        return WhileLoop(condition, body)
+
+    def parse_for_loop(self):
+        self.expect('TOK_FOR')
+        self.expect('TOK_LPAREN')
+        init = None
+        if self.current_token().type in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
+            init = self.parse_var_declaration()
+        else:
+            init = self.parse_expression()
+            self.expect('TOK_SEMICOLON')
+        condition = self.parse_expression()
+        self.expect('TOK_SEMICOLON')
+        increment = self.parse_expression()
+        self.expect('TOK_RPAREN')
+        body = self.parse_block()
+        return ForLoop(init, condition, increment, body)       
+
+    def parse_do_while_loop(self):
+        self.expect('TOK_DO')
+        body = self.parse_block()
+        self.expect('TOK_WHILE')
+        self.expect('TOK_LPAREN')
+        condition = self.parse_expression()
+        self.expect('TOK_RPAREN')
+        self.expect('TOK_SEMICOLON')
+        return DoWhileLoop(body, condition)
+
+    def parse_function_call(self):
+        name = self.expect('TOK_IDENTIFIER').value
+        self.expect('TOK_LPAREN')
+        args = []
+        if not self.match('TOK_RPAREN'):
+            while True:
+                args.append(self.parse_expression())
+                if self.match('TOK_COMMA'):
+                    continue
+                else:
+                    self.expect('TOK_RPAREN')
+                    break
+        self.expect('TOK_SEMICOLON')
+        return FunctionCall(name, args)
+
+    def parse_break(self):
+        self.expect('TOK_BREAK')
+        self.expect('TOK_SEMICOLON')
+        return BreakStatement()
+
+    def parse_continue(self):
+        self.expect('TOK_CONTINUE')
+        self.expect('TOK_SEMICOLON')
+        return ContinueStatement()
+
+    def parse_return(self):
+        self.expect('TOK_RETURN')
+        value = None
+        if not self.match('TOK_SEMICOLON'):
+            value = self.parse_expression()
+            self.expect('TOK_SEMICOLON')
+        return ReturnStatement(value)
