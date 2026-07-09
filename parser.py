@@ -90,6 +90,11 @@ class CParser(object):
 
         elif token_type == 'TOK_BREAK':
             return self.parse_break()
+        
+        else:
+            expr = self.parse_expression()
+            self.expect('TOK_SEMICOLON')
+            return expr
 
     def parse_block(self):
         self.expect('TOK_LBRACE')
@@ -101,7 +106,7 @@ class CParser(object):
         return ast
     
     def parse_expression(self):
-        return self.parse_logic_or()
+        return self.parse_logical_or()
 
     def parse_logical_or(self):
         left = self.parse_logical_and()
@@ -162,7 +167,13 @@ class CParser(object):
     def parse_primary(self):
         token_type = self.current_token().type
         if token_type == 'TOK_IDENTIFIER':
-            return Identifier(self.parse_variable())
+            name = self.parse_variable()
+            # Handle postfix operators: i++, i--
+            if self.current_token().type in ['TOK_INC', 'TOK_DEC']:
+                op = self.current_token().value
+                self.advance()
+                return UnaryOp(op, Identifier(name))
+            return Identifier(name)
         elif token_type == 'TOK_NUMBER':
             value = int(self.parse_number())
             return Literal(value)
@@ -191,6 +202,7 @@ class CParser(object):
         name = self.expect('TOK_IDENTIFIER').value
         self.expect('TOK_ASSIGN')
         value = self.parse_expression()
+        self.expect('TOK_SEMICOLON')
         return Assignment(name, value)
 
     def parse_var_declaration(self):
@@ -221,6 +233,7 @@ class CParser(object):
                 if token.type not in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
                     raise SyntaxError("Expected type keyword")
                 param_type = token.value
+                self.advance()
                 param_name = self.expect('TOK_IDENTIFIER').value
                 params.append((param_type, param_name))
                 if self.match('TOK_COMMA'):
@@ -251,20 +264,37 @@ class CParser(object):
         return WhileLoop(condition, body)
 
     def parse_for_loop(self):
+        print("DEBUG: parse_for_loop START")
         self.expect('TOK_FOR')
+        print("DEBUG: after FOR")
         self.expect('TOK_LPAREN')
+        print("DEBUG: after LPAREN")
         init = None
         if self.current_token().type in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
-            init = self.parse_var_declaration()
+            token = self.current_token()
+            data_type = token.value
+            self.advance()
+            name = self.expect('TOK_IDENTIFIER').value
+            init_value = None
+            if self.match('TOK_ASSIGN'):
+                init_value = self.parse_expression()
+            self.expect('TOK_SEMICOLON')
+            init = VarDeclaration(data_type, name, init_value)
         else:
             init = self.parse_expression()
             self.expect('TOK_SEMICOLON')
+        print("DEBUG: after init, current token:", self.current_token().type, self.current_token().value)
         condition = self.parse_expression()
+        print("DEBUG: after condition, current token:", self.current_token().type, self.current_token().value)
         self.expect('TOK_SEMICOLON')
+        print("DEBUG: after cond semicolon")
         increment = self.parse_expression()
+        print("DEBUG: after increment, current token:", self.current_token().type, self.current_token().value)
         self.expect('TOK_RPAREN')
+        print("DEBUG: after RPAREN")
         body = self.parse_block()
-        return ForLoop(init, condition, increment, body)       
+        print("DEBUG: after body")
+        return ForLoop(init, condition, increment, body)     
 
     def parse_do_while_loop(self):
         self.expect('TOK_DO')
@@ -308,3 +338,7 @@ class CParser(object):
             value = self.parse_expression()
             self.expect('TOK_SEMICOLON')
         return ReturnStatement(value)
+
+class PyParser(object):
+    #YET TO BE DONE BY SURYA
+    pass
