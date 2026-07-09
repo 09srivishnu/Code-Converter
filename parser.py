@@ -162,11 +162,13 @@ class CParser(object):
     def parse_primary(self):
         token_type = self.current_token().type
         if token_type == 'TOK_IDENTIFIER':
-            return self.parse_variable()
+            return Identifier(self.parse_variable())
         elif token_type == 'TOK_NUMBER':
-            return self.parse_number()
+            value = int(self.parse_number())
+            return Literal(value)
         elif token_type == 'TOK_STRING':
-            return self.parse_string()
+            value = self.parse_string()
+            return Literal(value)
         elif token_type == 'TOK_LPAREN':
             self.advance()
             expr = self.parse_expression()
@@ -209,6 +211,7 @@ class CParser(object):
         if token.type not in ['TOK_INT', 'TOK_CHAR', 'TOK_FLOAT', 'TOK_DOUBLE', 'TOK_VOID']:
             raise SyntaxError("Expected type keyword")
         return_type = token.value
+        self.advance()
         name = self.expect('TOK_IDENTIFIER').value
         self.expect('TOK_LPAREN')
         params = []
