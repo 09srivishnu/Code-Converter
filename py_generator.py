@@ -120,8 +120,25 @@ class PythonGenerator(object):
 
     def generate_function_call(self, node):
         py_name = self.map_c_function_to_python(node.name)
-        args = ', '.join(self.generate_expression(arg) for arg in node.args)
-        self.emit(f"{py_name}({args})")
+    
+        if py_name == 'print':
+            if len(node.args) > 0 and isinstance(node.args[0], Literal):
+                fmt_str = node.args[0].value
+                format_args = node.args[1:]
+            
+                converted_fmt = fmt_str
+                converted_fmt = converted_fmt.replace('%d', '{}')
+                converted_fmt = converted_fmt.replace('%s', '{}')
+                converted_fmt = converted_fmt.replace('%f', '{}')
+            
+                args_str = ', '.join(self.generate_expression(arg) for arg in format_args)
+                self.emit(f"print(f\"{converted_fmt}\".format({args_str}))")
+            else:
+                args = ', '.join(self.generate_expression(arg) for arg in node.args)
+                self.emit(f"{py_name}({args})")
+        else:
+            args = ', '.join(self.generate_expression(arg) for arg in node.args)
+            self.emit(f"{py_name}({args})")
 
     def generate_return_statement(self, node):
         if node.value is not None:
