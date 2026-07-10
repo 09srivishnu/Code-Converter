@@ -3,8 +3,14 @@ from parser import CParser
 from py_generator import PythonGenerator
 
 code = """
-int x = 5;
-x = x + 1;
+int main() {
+    int n = 29;
+    int cnt = 0;
+    if (n <= 1) {
+        printf("%d is NOT prime", n);
+    }
+    return 0;
+}
 """
 
 lexer = CLexer(code)

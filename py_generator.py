@@ -119,8 +119,9 @@ class PythonGenerator(object):
         self.decrease_indent()
 
     def generate_function_call(self, node):
+        py_name = self.map_c_function_to_python(node.name)
         args = ', '.join(self.generate_expression(arg) for arg in node.args)
-        self.emit(f"{node.name}({args})")
+        self.emit(f"{py_name}({args})")
 
     def generate_return_statement(self, node):
         if node.value is not None:
@@ -167,3 +168,21 @@ class PythonGenerator(object):
         else:
             raise ValueError("Unsupported expression node type: {}".format(type(node)))
 
+    def map_c_function_to_python(self, name):
+        mapping = {
+        'printf': 'print',
+        'scanf': 'input',
+        'strlen': 'len',
+        'malloc': 'list',
+        }
+        return mapping.get(name, name)
+
+    def infer_python_type(self, value):
+        if isinstance(value, Literal):
+            if isinstance(value.value, int):
+                return 0
+            elif isinstance(value.value, float):
+                return 0.0
+            elif isinstance(value.value, str):
+                return ""
+        return None
