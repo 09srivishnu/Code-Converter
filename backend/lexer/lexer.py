@@ -1,5 +1,5 @@
-from keywords import get_token_type
-from token import Token
+from .keywords import get_token_type
+from .token_class import Token
 
 class CLexer(object):
     def __init__(self, code):

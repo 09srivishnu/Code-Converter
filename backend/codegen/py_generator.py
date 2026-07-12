@@ -1,5 +1,4 @@
-from ast_nodes import *
-
+from parser.ast_nodes import *
 class PythonGenerator(object):
     def __init__(self, ast):
         self.ast = ast

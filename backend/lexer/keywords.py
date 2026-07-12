@@ -78,7 +78,7 @@ TOKEN_TO_KEYWORD_PY = {v : k for k, v in PYTHON_KEYWORDS.items()}
 def is_c_keyword(word):
     return word in C_KEYWORDS
 
-def is_py_keyword(word):
+def is_py_keyword(word):    
     return word in PYTHON_KEYWORDS
 
 def is_keyword(word, language):

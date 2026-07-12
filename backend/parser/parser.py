@@ -1,4 +1,5 @@
-from ast_nodes import *
+from parser.ast_nodes import *
+from lexer.token_class import Token
 class CParser(object):
     def __init__(self, tokens):
         self.tokens = tokens
@@ -157,7 +158,7 @@ class CParser(object):
         return left
 
     def parse_unary(self):
-        if self.match('TOK_NOT', 'TOK_MINUS', 'TOK_INC', 'TOK_DEC'):
+        if self.match('TOK_NOT', 'TOK_MINUS', 'TOK_INC', 'TOK_DEC', 'TOK_BITAND', 'TOK_STAR'):
             op = self.tokens[self.pos - 1].value
             operand = self.parse_unary()
             return UnaryOp(op, operand)
