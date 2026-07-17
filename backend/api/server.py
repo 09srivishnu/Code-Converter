@@ -19,13 +19,20 @@ from parser.parser import CParser, PyParser
 from codegen.py_generator import PythonGenerator
 from codegen.c_generator import CGenerator
 
+# Enable CORS for all routes
+
 # ============================================================
 # Flask App Configuration
 # ============================================================
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for React frontend
-
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173", "http://localhost:3000"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 # ============================================================
 # Error Handler Middleware
 # ============================================================
@@ -304,6 +311,6 @@ if __name__ == '__main__':
     app.run(
         debug=True,
         host='0.0.0.0',
-        port=5001,
+        port=5000,
         use_reloader=True
     )
