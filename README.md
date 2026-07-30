@@ -1,7 +1,6 @@
 # C/Python Code Converter
 
 This project consists of two separate C programs designed to convert code snippets between C and Python. Each program is a simple command-line utility that takes input C or Python code and outputs a translation into the other language.
-
 ---
 
 ## 📂 `Cproject24.c` - C to Python Converter
@@ -94,4 +93,4 @@ To use these programs, you'll need a C compiler like GCC.
 * **Error Handling**: Both programs have limited error handling. Malformed input may lead to unexpected results or crashes.
 * **Complex Statements**: The converters only handle a limited subset of each language. More complex expressions, function calls, or data structures are not supported.
 * **Python to C Converter**: The `pythonTOc.c` program currently only works with hardcoded input. It could be improved by reading input from a file or standard input, similar to `Cproject24.c`.
-* **Type System**: The C to Python converter doesn't infer data types from assignments, and the Python to C converter makes a simple assumption. A more robust solution would handle type inference and conversions more intelligently.
+* **Type System**: The C to Python converter doesn't infer data types from assignments, and the Python to C converter makes a simple assumption. 
